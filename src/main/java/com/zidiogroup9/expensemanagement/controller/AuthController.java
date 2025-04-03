@@ -3,6 +3,7 @@ package com.zidiogroup9.expensemanagement.controller;
 import com.zidiogroup9.expensemanagement.dtos.SignUpDto;
 import com.zidiogroup9.expensemanagement.dtos.UserDto;
 import com.zidiogroup9.expensemanagement.services.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<UserDto> signUp(@RequestBody SignUpDto signUpDto){
+    public ResponseEntity<UserDto> signUp(@RequestBody @Valid SignUpDto signUpDto){
         return new ResponseEntity<>(authService.signUp(signUpDto), HttpStatus.CREATED);
     }
 }
