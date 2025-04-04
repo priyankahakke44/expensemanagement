@@ -4,5 +4,7 @@ import com.zidiogroup9.expensemanagement.dtos.*;
 
 public interface AuthService {
     UserDto signUp(SignUpDto signUpDto);
-    LoginResponseDto login(LoginDto loginDto);
+    String[] login(LoginDto loginDto);
+    String[] refreshToken(String refreshToken);
+    UserDto getProfile();
 }
