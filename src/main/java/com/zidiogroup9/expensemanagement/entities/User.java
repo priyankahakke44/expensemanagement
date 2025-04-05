@@ -2,8 +2,7 @@ package com.zidiogroup9.expensemanagement.entities;
 
 import com.zidiogroup9.expensemanagement.entities.enums.Role;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,6 +19,9 @@ import java.util.stream.Collectors;
 @Table(name = "app_user")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
