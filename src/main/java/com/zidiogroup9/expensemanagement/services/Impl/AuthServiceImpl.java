@@ -66,9 +66,4 @@ public class AuthServiceImpl implements AuthService {
         return new String[]{accessToken,refreshToken};
     }
 
-    @Override
-    public UserDto getProfile() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return modelMapper.map(user,UserDto.class);
-    }
 }

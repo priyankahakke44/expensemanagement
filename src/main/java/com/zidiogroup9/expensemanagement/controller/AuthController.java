@@ -37,12 +37,6 @@ public class AuthController {
         return ResponseEntity.ok(new LoginResponseDto(tokens[0]));
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping(path = "/profile")
-    public ResponseEntity<UserDto> getProfile(){
-        return ResponseEntity.ok(authService.getProfile());
-    }
-
     @PostMapping(path = "/refresh")
     public ResponseEntity<LoginResponseDto> refresh(HttpServletRequest request){
         String refreshToken= Arrays.stream(request.getCookies())
