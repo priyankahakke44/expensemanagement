@@ -1,5 +1,7 @@
 package com.zidiogroup9.expensemanagement.advices;
 
+import com.zidiogroup9.expensemanagement.exceptions.InvalidPasswordException;
+import com.zidiogroup9.expensemanagement.exceptions.PasswordMismatchException;
 import com.zidiogroup9.expensemanagement.exceptions.ResourceNotFoundException;
 import com.zidiogroup9.expensemanagement.exceptions.RuntimeConflictException;
 import io.jsonwebtoken.JwtException;
@@ -57,6 +59,24 @@ public class GlobalExceptionHandler {
                 .build();
         return buildErrorResponseEntity(apiError);
     }
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<ApiResponse<?>> handleInvalidPasswordException(InvalidPasswordException exe){
+        ApiError apiError = ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .message(exe.getMessage())
+                .build();
+        return buildErrorResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(PasswordMismatchException.class)
+    public ResponseEntity<ApiResponse<?>> handlePasswordMismatchException(PasswordMismatchException exe){
+        ApiError apiError = ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .message(exe.getMessage())
+                .build();
+        return buildErrorResponseEntity(apiError);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<?>> handleValidationError(MethodArgumentNotValidException exception) {
         List<String> errors = exception.getBindingResult()
