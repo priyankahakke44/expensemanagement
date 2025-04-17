@@ -5,5 +5,6 @@ public enum Status {
     PENDING_FINANCE,
     PENDING_ADMIN,
     APPROVED,
-    REJECTED
+    REJECTED,
+    PENDING
 }

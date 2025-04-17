@@ -1,9 +1,6 @@
 package com.zidiogroup9.expensemanagement.advices;
 
-import com.zidiogroup9.expensemanagement.exceptions.InvalidPasswordException;
-import com.zidiogroup9.expensemanagement.exceptions.PasswordMismatchException;
-import com.zidiogroup9.expensemanagement.exceptions.ResourceNotFoundException;
-import com.zidiogroup9.expensemanagement.exceptions.RuntimeConflictException;
+import com.zidiogroup9.expensemanagement.exceptions.*;
 import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,6 +58,15 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(InvalidPasswordException.class)
     public ResponseEntity<ApiResponse<?>> handleInvalidPasswordException(InvalidPasswordException exe){
+        ApiError apiError = ApiError.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .message(exe.getMessage())
+                .build();
+        return buildErrorResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(DepartmentNotAssignedException.class)
+    public ResponseEntity<ApiResponse<?>> handleDepartmentNotAssignedException(DepartmentNotAssignedException exe){
         ApiError apiError = ApiError.builder()
                 .status(HttpStatus.BAD_REQUEST)
                 .message(exe.getMessage())

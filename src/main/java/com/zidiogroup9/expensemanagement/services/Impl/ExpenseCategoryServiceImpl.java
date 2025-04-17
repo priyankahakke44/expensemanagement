@@ -17,18 +17,20 @@ import java.util.stream.Collectors;
 public class ExpenseCategoryServiceImpl implements ExpenseCategoryService {
     private final ModelMapper modelMapper;
     private final ExpenseCategoryRepository expenseCategoryRepository;
+
     @Override
     public ExpenseCategoryDto createExpenseCategory(ExpenseCategoryDto expenseCategoryDto) {
-        ExpenseCategory expenseCategory = modelMapper.map(expenseCategoryDto,ExpenseCategory.class);
-        ExpenseCategory toSavedExpenseCategory = expenseCategoryRepository.save(expenseCategory);
-        return modelMapper.map(toSavedExpenseCategory,ExpenseCategoryDto.class);
+        try {
+            ExpenseCategory expenseCategory = modelMapper.map(expenseCategoryDto, ExpenseCategory.class);
+            return modelMapper.map(expenseCategoryRepository.save(expenseCategory), ExpenseCategoryDto.class);
+        } catch (Exception e){
+            throw new RuntimeException("Failed to create expense category ",e);
+        }
     }
 
     @Override
     public void deleteExpenseCategoryById(String id) {
-        expenseCategoryRepository.findById(id).orElseThrow(
-                ()-> new ResourceNotFoundException("Expense Category not found with id :"+id)
-        );
+        gerExpenseCategoryById(id);
         expenseCategoryRepository.deleteById(id);
     }
 
@@ -37,10 +39,18 @@ public class ExpenseCategoryServiceImpl implements ExpenseCategoryService {
         try {
             return expenseCategoryRepository.findAll()
                     .stream()
-                    .map(expenseCategory -> modelMapper.map(expenseCategory,ExpenseCategoryDto.class))
+                    .map(expenseCategory -> modelMapper.map(expenseCategory, ExpenseCategoryDto.class))
                     .collect(Collectors.toList());
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Failed to fetch expense category", e);
         }
     }
+
+    @Override
+    public ExpenseCategory gerExpenseCategoryById(String id) {
+        return expenseCategoryRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Expense Category not found with id :" + id)
+        );
+    }
+
 }

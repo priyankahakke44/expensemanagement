@@ -19,23 +19,28 @@ public class UserServiceIml implements UserService {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+
     @Override
     public UserDto getProfile() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return modelMapper.map(user,UserDto.class);
+        User user = getCurrentUser();
+        return modelMapper.map(user, UserDto.class);
     }
 
     @Override
     public void changePassword(ChangePasswordDto changePasswordDto) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if (!passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword())){
+        User user = getCurrentUser();
+        if (!passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword())) {
             throw new InvalidPasswordException("Wrong Password");
         }
-        if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())){
+        if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())) {
             throw new PasswordMismatchException("Password are not same");
         }
         user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
         userRepository.save(user);
+    }
+
+    @Override
+    public User getCurrentUser() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }
