@@ -13,6 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceIml implements UserService {
@@ -42,5 +44,9 @@ public class UserServiceIml implements UserService {
     @Override
     public User getCurrentUser() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+    @Override
+    public UserDto updateProfile(Map<String, Object> updates) {
+        return null;
     }
 }

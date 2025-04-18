@@ -82,6 +82,14 @@ public class GlobalExceptionHandler {
                 .build();
         return buildErrorResponseEntity(apiError);
     }
+    @ExceptionHandler(FilesUploadException.class)
+    public ResponseEntity<ApiResponse<?>> handleFilesUploadException(FilesUploadException exe){
+        ApiError apiError = ApiError.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .message(exe.getMessage())
+                .build();
+        return buildErrorResponseEntity(apiError);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<?>> handleValidationError(MethodArgumentNotValidException exception) {
