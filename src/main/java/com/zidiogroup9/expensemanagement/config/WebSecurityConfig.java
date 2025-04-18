@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
-    private static final String[] PUBLIC_ROUTS = {"/error","api/auth/**"};
+    private static final String[] PUBLIC_ROUTS = {"/error","api/auth/**","api/user/**"};
     private final JwtFilter jwtFilter;
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
