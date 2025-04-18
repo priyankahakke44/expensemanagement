@@ -1,9 +1,6 @@
 package com.zidiogroup9.expensemanagement.advices;
 
-import com.zidiogroup9.expensemanagement.exceptions.InvalidPasswordException;
-import com.zidiogroup9.expensemanagement.exceptions.PasswordMismatchException;
-import com.zidiogroup9.expensemanagement.exceptions.ResourceNotFoundException;
-import com.zidiogroup9.expensemanagement.exceptions.RuntimeConflictException;
+import com.zidiogroup9.expensemanagement.exceptions.*;
 import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,6 +69,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<?>> handlePasswordMismatchException(PasswordMismatchException exe){
         ApiError apiError = ApiError.builder()
                 .status(HttpStatus.BAD_REQUEST)
+                .message(exe.getMessage())
+                .build();
+        return buildErrorResponseEntity(apiError);
+    }
+    @ExceptionHandler(FilesUploadException.class)
+    public ResponseEntity<ApiResponse<?>> handleFilesUploadException(FilesUploadException exe){
+        ApiError apiError = ApiError.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .message(exe.getMessage())
                 .build();
         return buildErrorResponseEntity(apiError);

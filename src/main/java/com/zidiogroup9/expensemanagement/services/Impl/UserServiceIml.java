@@ -1,6 +1,7 @@
 package com.zidiogroup9.expensemanagement.services.Impl;
 
 import com.zidiogroup9.expensemanagement.dtos.ChangePasswordDto;
+import com.zidiogroup9.expensemanagement.dtos.UpdateProfileDto;
 import com.zidiogroup9.expensemanagement.dtos.UserDto;
 import com.zidiogroup9.expensemanagement.entities.User;
 import com.zidiogroup9.expensemanagement.exceptions.InvalidPasswordException;
@@ -12,6 +13,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -37,5 +40,9 @@ public class UserServiceIml implements UserService {
         }
         user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
         userRepository.save(user);
+    }
+    @Override
+    public UserDto updateProfile(Map<String, Object> updates) {
+        return null;
     }
 }
