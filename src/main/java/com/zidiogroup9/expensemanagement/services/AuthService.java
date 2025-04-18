@@ -7,6 +7,7 @@ public interface AuthService {
     UserDto signUp(SignUpDto signUpDto);
     String[] login(LoginDto loginDto);
     String[] refreshToken(String refreshToken);
-    UserDto getProfile();
+    void sendResetLink(String email);
+    void resetPassword(String token, String newPassword);
 
 }

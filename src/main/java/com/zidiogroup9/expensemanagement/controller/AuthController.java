@@ -1,9 +1,7 @@
 package com.zidiogroup9.expensemanagement.controller;
 
-import com.zidiogroup9.expensemanagement.dtos.LoginDto;
-import com.zidiogroup9.expensemanagement.dtos.LoginResponseDto;
-import com.zidiogroup9.expensemanagement.dtos.SignUpDto;
-import com.zidiogroup9.expensemanagement.dtos.UserDto;
+import com.zidiogroup9.expensemanagement.advices.ApiResponse;
+import com.zidiogroup9.expensemanagement.dtos.*;
 import com.zidiogroup9.expensemanagement.services.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,12 +35,6 @@ public class AuthController {
         return ResponseEntity.ok(new LoginResponseDto(tokens[0]));
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping(path = "/profile")
-    public ResponseEntity<UserDto> getProfile(){
-        return ResponseEntity.ok(authService.getProfile());
-    }
-
     @PostMapping(path = "/refresh")
     public ResponseEntity<LoginResponseDto> refresh(HttpServletRequest request){
         String refreshToken= Arrays.stream(request.getCookies())
@@ -52,5 +44,18 @@ public class AuthController {
                 .orElseThrow(()->new AuthenticationServiceException("Refresh token not found inside the Cookies"));
         String[] tokens = authService.refreshToken(refreshToken);
         return ResponseEntity.ok(new LoginResponseDto(tokens[0]));
+    }
+
+    @PostMapping(path = "/forgetPassword")
+    public ResponseEntity<ApiResponse<?>> forgetPasswordRequest(@RequestBody ForgetPasswordRequestDto forgetPasswordRequestDto){
+        authService.sendResetLink(forgetPasswordRequestDto.getEmail());
+        ApiResponse<String> response = new ApiResponse<>("Password reset link sent to your email");
+        return ResponseEntity.ok(response);
+    }
+    @PatchMapping(path = "/resetPassword")
+    public ResponseEntity<ApiResponse<?>> resetPassword(@RequestBody ResetPasswordDto resetPasswordDto){
+        authService.resetPassword(resetPasswordDto.getToken(),resetPasswordDto.getNewPassword());
+        ApiResponse<String> response = new ApiResponse<>("Password has been reset successfully");
+        return ResponseEntity.ok(response);
     }
 }
