@@ -73,6 +73,16 @@ public class UserServiceIml implements UserService {
     }
 
     @Override
+    public User loadUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
+    @Override
+    public User save(User newUser) {
+        return userRepository.save(newUser);
+    }
+
+    @Override
     public User getCurrentUser() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }

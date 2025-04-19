@@ -1,5 +1,6 @@
 package com.zidiogroup9.expensemanagement.config;
 
+import com.zidiogroup9.expensemanagement.handers.OAuth2SuccessHandler;
 import com.zidiogroup9.expensemanagement.security.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +18,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
-    private static final String[] PUBLIC_ROUTS = {"/error","api/auth/**"};
+    private static final String[] PUBLIC_ROUTS = {"/error", "api/auth/**", "/home.html"};
     private final JwtFilter jwtFilter;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(auth ->
@@ -26,9 +29,14 @@ public class WebSecurityConfig {
                                 .requestMatchers(PUBLIC_ROUTS).permitAll()
                                 .anyRequest().authenticated())
                 .csrf(csrfConfig -> csrfConfig.disable())
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login(oauth2config -> oauth2config
+                        .failureUrl("/login?error=true")
+                        .successHandler(oAuth2SuccessHandler)
+                );
         return httpSecurity.build();
     }
+
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();

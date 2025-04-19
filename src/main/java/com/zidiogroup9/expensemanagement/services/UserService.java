@@ -12,4 +12,6 @@ public interface UserService {
     User getCurrentUser();
     void changePassword(ChangePasswordDto changePasswordDto);
     UserDto updateProfile(Map<String, Object> updates);
+    User loadUserByEmail(String email);
+     User save(User newUser);
 }

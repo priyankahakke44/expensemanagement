@@ -65,6 +65,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-client</artifactId>
+		</dependency>
 		<!--This provides the core API for generating, parsing, and validating JWTs.
 It contains all the interfaces and classes necessary for creating and managing JWTs. -->
 		<dependency>
