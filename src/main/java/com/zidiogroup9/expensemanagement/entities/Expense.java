@@ -20,14 +20,13 @@ public class Expense {
     private String id;
 
     private Double amount;
+    @Column(length = 1000)
     private String invoice;
     private String description;
 
-    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     private ApproverRole approvedBy;
 
-    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     private Status status;
 

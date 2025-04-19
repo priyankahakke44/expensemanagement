@@ -18,7 +18,6 @@ public class S3Config {
     private String awsSecretKey;
     @Value("${aws.region}")
     private String region;
-
     @Bean
     public AmazonS3 client(){
         AWSCredentials credentials = new BasicAWSCredentials(awsAccessKey,awsSecretKey);

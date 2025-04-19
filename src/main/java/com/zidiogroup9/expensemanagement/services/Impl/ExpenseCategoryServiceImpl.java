@@ -30,7 +30,7 @@ public class ExpenseCategoryServiceImpl implements ExpenseCategoryService {
 
     @Override
     public void deleteExpenseCategoryById(String id) {
-        gerExpenseCategoryById(id);
+        getExpenseCategoryById(id);
         expenseCategoryRepository.deleteById(id);
     }
 
@@ -47,7 +47,7 @@ public class ExpenseCategoryServiceImpl implements ExpenseCategoryService {
     }
 
     @Override
-    public ExpenseCategory gerExpenseCategoryById(String id) {
+    public ExpenseCategory getExpenseCategoryById(String id) {
         return expenseCategoryRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Expense Category not found with id :" + id)
         );

@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateProfileDto {
-    @NotBlank(message = "Name is mandatory")
     @Size(min = 3,message = "The name must consist of more than three letters")
     private String name;
     private MultipartFile image;

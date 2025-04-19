@@ -9,5 +9,5 @@ public interface ExpenseCategoryService {
     ExpenseCategoryDto createExpenseCategory(ExpenseCategoryDto expenseCategoryDto);
     void deleteExpenseCategoryById(String id);
     List<ExpenseCategoryDto> getAllExpenseCategory();
-    ExpenseCategory gerExpenseCategoryById(String id);
+    ExpenseCategory getExpenseCategoryById(String id);
 }
