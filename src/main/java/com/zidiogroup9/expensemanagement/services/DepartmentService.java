@@ -8,4 +8,6 @@ public interface DepartmentService {
     DepartmentDto createDepartment(DepartmentDto departmentDto);
     List<DepartmentDto> getAllDepartment();
     DepartmentDto getDepartmentById(String id);
+
+    boolean checkDepartmentById(String id);
 }

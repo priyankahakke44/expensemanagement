@@ -48,4 +48,9 @@ public class DepartmentServiceImpl implements DepartmentService {
         );
         return modelMapper.map(department, DepartmentDto.class);
     }
+
+    @Override
+    public boolean checkDepartmentById(String id) {
+        return departmentRepository.existsById(id);
+    }
 }

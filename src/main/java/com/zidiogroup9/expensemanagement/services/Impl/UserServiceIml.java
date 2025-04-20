@@ -1,11 +1,17 @@
 package com.zidiogroup9.expensemanagement.services.Impl;
 
 import com.zidiogroup9.expensemanagement.dtos.ChangePasswordDto;
+import com.zidiogroup9.expensemanagement.dtos.DepartmentDto;
 import com.zidiogroup9.expensemanagement.dtos.UserDto;
+import com.zidiogroup9.expensemanagement.entities.Department;
 import com.zidiogroup9.expensemanagement.entities.User;
+import com.zidiogroup9.expensemanagement.entities.enums.Role;
 import com.zidiogroup9.expensemanagement.exceptions.InvalidPasswordException;
 import com.zidiogroup9.expensemanagement.exceptions.PasswordMismatchException;
+import com.zidiogroup9.expensemanagement.exceptions.ResourceNotFoundException;
+import com.zidiogroup9.expensemanagement.exceptions.RuntimeConflictException;
 import com.zidiogroup9.expensemanagement.repositories.UserRepository;
+import com.zidiogroup9.expensemanagement.services.DepartmentService;
 import com.zidiogroup9.expensemanagement.services.FileUploaderService;
 import com.zidiogroup9.expensemanagement.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +34,7 @@ public class UserServiceIml implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final FileUploaderService fileUploaderService;
+    private final DepartmentService departmentService;
 
     @Override
     public UserDto getProfile() {
@@ -83,7 +90,43 @@ public class UserServiceIml implements UserService {
     }
 
     @Override
+    public UserDto assignDepartment(String email, DepartmentDto departmentDto) {
+        User user = getUserByEmail(email);
+        if (!departmentService.checkDepartmentById(departmentDto.getId())){
+            throw new ResourceNotFoundException("Department not found");
+        }
+        user.setDepartment(modelMapper.map(departmentDto,Department.class));
+        return modelMapper.map(userRepository.save(user),UserDto.class);
+    }
+
+    @Override
+    public UserDto onboardManager(String email) {
+        User user = getUserByEmail(email);
+        if (user.getRoles().contains(Role.MANAGER)){
+            throw new RuntimeConflictException("User with email" + email + "is already a Manager");
+        }
+        user.getRoles().add(Role.MANAGER);
+        return modelMapper.map(userRepository.save(user),UserDto.class);
+    }
+
+    @Override
+    public UserDto onboardFinance(String email) {
+        User user = getUserByEmail(email);
+        if (user.getRoles().contains(Role.FINANCE)){
+            throw new RuntimeConflictException("User with email" + email + "is already a Manager");
+        }
+        user.getRoles().add(Role.FINANCE);
+        return modelMapper.map(userRepository.save(user),UserDto.class);
+    }
+
+    @Override
     public User getCurrentUser() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    private User getUserByEmail(String email){
+        return userRepository.findByEmail(email).orElseThrow(
+                ()->new ResourceNotFoundException("User not found with email: "+email)
+        );
     }
 }
