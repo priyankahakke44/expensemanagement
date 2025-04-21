@@ -1,32 +1,58 @@
 package com.zidiogroup9.expensemanagement.services.Impl;
 
-import java.util.Optional;
-import java.util.Set;
 
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.springframework.stereotype.Service;
-
-import com.zidiogroup9.expensemanagement.dtos.SignUpDto;
+import com.zidiogroup9.expensemanagement.dtos.ChangePasswordDto;
 import com.zidiogroup9.expensemanagement.dtos.UpdateUserDto;
 import com.zidiogroup9.expensemanagement.dtos.UserDto;
 import com.zidiogroup9.expensemanagement.entities.User;
-import com.zidiogroup9.expensemanagement.entities.enums.Role;
+import com.zidiogroup9.expensemanagement.exceptions.InvalidPasswordException;
+import com.zidiogroup9.expensemanagement.exceptions.PasswordMismatchException;
 import com.zidiogroup9.expensemanagement.exceptions.ResourceNotFoundException;
 import com.zidiogroup9.expensemanagement.exceptions.RuntimeConflictException;
 import com.zidiogroup9.expensemanagement.repositories.UserRepository;
 import com.zidiogroup9.expensemanagement.services.UserService;
-
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-
-public class UserServiceimpl implements UserService {
+public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final ModelMapper modelMapper;
+	 private final PasswordEncoder passwordEncoder;
+
+	@Override
+	public UserDto getProfile() {
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return modelMapper.map(user, UserDto.class);
+	}
+
+	@Override
+	public void changePassword(ChangePasswordDto changePasswordDto) {
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+		if (!passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword())) {
+			throw new InvalidPasswordException("Wrong Password");
+		}
+		if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())) {
+			throw new PasswordMismatchException("Password are not same");
+		}
+		user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
+		userRepository.save(user);
+	}
 
 	@Override
 	public UserDto findUserById(String id) {
@@ -50,7 +76,7 @@ public class UserServiceimpl implements UserService {
 	}
 
 	@Override
-	public UserDto updateUser(String id,UpdateUserDto updateUserDto) {
+	public UserDto updateUser(String id, UpdateUserDto updateUserDto) {
 		Optional<User> userOptional = userRepository.findById(id);
 
 		if (userOptional.isEmpty()) {
@@ -70,4 +96,21 @@ public class UserServiceimpl implements UserService {
 		}
 	}
 
+	@Override
+	public List<UserDto> findall(int pageNo, int noOfRecords) {
+		
+		Pageable pageable = PageRequest.of(pageNo, noOfRecords);		
+	
+				List<User> users = userRepository.findAll(pageable).get().toList();
+
+		if (users.isEmpty()) {
+			throw new RuntimeConflictException("User/Users Not availbale");
+		} else {
+			List<UserDto> userList = new ArrayList<UserDto>();
+			return userList = users.stream().map(user -> modelMapper.map(user, UserDto.class))
+					.collect(Collectors.toList());
+		}
+	}
+
+	
 }
