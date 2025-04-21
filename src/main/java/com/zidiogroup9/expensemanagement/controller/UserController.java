@@ -5,6 +5,9 @@ import com.zidiogroup9.expensemanagement.dtos.ChangePasswordDto;
 import com.zidiogroup9.expensemanagement.dtos.UpdateUserDto;
 import com.zidiogroup9.expensemanagement.dtos.UserDto;
 
+import com.zidiogroup9.expensemanagement.services.Impl.UserServiceIml;
+import com.zidiogroup9.expensemanagement.services.Impl.UserServiceImpl;
+
 
 import com.zidiogroup9.expensemanagement.services.Impl.UserServiceImpl;
 
@@ -17,12 +20,21 @@ import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
+import java.util.List;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
+
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
@@ -30,7 +42,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 public class UserController {
 	private final UserServiceImpl userServiceImpl;
+	private final UserServiceImpl userServiceImpl;
 	private final ModelMapper mapper;
+
+	@GetMapping(path = "/profile")
+	public ResponseEntity<UserDto> getProfile() {
+		return ResponseEntity.ok(userServiceImpl.getProfile());
+	}
+
+	@PatchMapping(path = "/changePassword")
+	public ResponseEntity<ApiResponse<?>> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
+		userServiceImpl.changePassword(changePasswordDto);
+		ApiResponse<String> response = new ApiResponse<>("Password changed successfully");
+		return ResponseEntity.ok(response);
+	}
 
 	@GetMapping(path = "/profile")
 	public ResponseEntity<UserDto> getProfile() {
@@ -56,6 +81,7 @@ public class UserController {
 	private ResponseEntity<String> deleteUser(@PathVariable(name = "id") String id,
 			HttpServletResponse httpServletResponse) {
 		UserDto deleteUser = userServiceImpl.deleteUser(id);
+		UserDto deleteUser = userServiceImpl.deleteUser(id);
 		if (deleteUser != null) {
 			mapper.map(deleteUser, String.class);
 			return new ResponseEntity<String>("User deleted", HttpStatus.OK);
@@ -65,6 +91,9 @@ public class UserController {
 	}
 
 	@PutMapping("update/{id}")
+	private ResponseEntity<UserDto> updateUser(@PathVariable(name = "id") String id,
+			@RequestBody UpdateUserDto updateUserDto, HttpServletResponse response) {
+		UserDto updatedUser = userServiceImpl.updateUser(id, updateUserDto);
 	private ResponseEntity<UserDto> updateUser(@PathVariable(name = "id") String id,
 			@RequestBody UpdateUserDto updateUserDto, HttpServletResponse response) {
 		UserDto updatedUser = userServiceImpl.updateUser(id, updateUserDto);
@@ -80,6 +109,15 @@ public class UserController {
 			@PathVariable(name = "noOfRecords") int noOfRecords, HttpServletResponse response) {
 		
 		List<UserDto> findall = userServiceImpl.findall(pageNo,noOfRecords);
+		return new ResponseEntity<List<UserDto>>(findall, HttpStatus.FOUND);
+	}
+
+
+	@GetMapping("all/{pageNo}/{noOfRecords}")
+	public ResponseEntity<List<UserDto>> findAllUsers(@PathVariable(name = "pageNo") int pageNo,
+			@PathVariable(name = "noOfRecords") int noOfRecords, HttpServletResponse response) {
+		
+		List<UserDto> findall = userServiceIml.findall(pageNo,noOfRecords);
 		return new ResponseEntity<List<UserDto>>(findall, HttpStatus.FOUND);
 	}
 
