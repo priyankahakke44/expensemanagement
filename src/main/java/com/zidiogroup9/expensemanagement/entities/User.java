@@ -36,6 +36,7 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
+    @Column(length = 1000)
     private String profile;
     @OneToOne
     @JoinColumn(name = "department_id")
