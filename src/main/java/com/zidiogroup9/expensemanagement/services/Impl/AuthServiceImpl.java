@@ -19,9 +19,12 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 
+import java.nio.file.attribute.UserPrincipalNotFoundException;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
@@ -39,31 +42,30 @@ public class AuthServiceImpl implements AuthService {
     private final ForgetPasswordService forgetPasswordService;
     private final EmailSenderService emailSenderService;
 
-    @Override
-    public UserDto signUp(SignUpDto signUpDto) {
-        Optional<User> user = userRepository.findByEmail(signUpDto.getEmail());
-        if (user.isPresent()) {
-            throw new RuntimeConflictException("Cannot signup, User already exists with email " + signUpDto.getEmail());
-        }
-        User mappedUser = modelMapper.map(signUpDto, User.class);
-        mappedUser.setProfile(null);
-        mappedUser.setRoles(Set.of(Role.EMPLOYEE));
-        mappedUser.setDepartment(null);
-        mappedUser.setPassword(passwordEncoder.encode(mappedUser.getPassword()));
-        User saveduser = userRepository.save(mappedUser);
-        return modelMapper.map(saveduser, UserDto.class);
-    }
+	@Override
+	public UserDto signUp(SignUpDto signUpDto) {
+		Optional<User> user = userRepository.findByEmail(signUpDto.getEmail());
+		if (user.isPresent()) {
+			throw new RuntimeConflictException("Cannot signup, User already exists with email " + signUpDto.getEmail());
+		}
+		User mappedUser = modelMapper.map(signUpDto, User.class);
+		mappedUser.setProfile(null);
+		mappedUser.setRoles(Set.of(Role.EMPLOYEE));
+		mappedUser.setDepartment(null);
+		mappedUser.setPassword(passwordEncoder.encode(mappedUser.getPassword()));
+		User saveduser = userRepository.save(mappedUser);
+		return modelMapper.map(saveduser, UserDto.class);
+	}
 
-    @Override
-    public String[] login(LoginDto loginDto) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
-        );
-        User user = (User) authentication.getPrincipal();
-        String accessToken = jwtService.createAccessToken(user);
-        String refreshToken = jwtService.createRefreshToken(user);
-        return new String[]{accessToken, refreshToken};
-    }
+	@Override
+	public String[] login(LoginDto loginDto) {
+		Authentication authentication = authenticationManager
+				.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
+		User user = (User) authentication.getPrincipal();
+		String accessToken = jwtService.createAccessToken(user);
+		String refreshToken = jwtService.createRefreshToken(user);
+		return new String[] { accessToken, refreshToken };
+	}
 
     @Override
     public String[] refreshToken(String refreshToken) {

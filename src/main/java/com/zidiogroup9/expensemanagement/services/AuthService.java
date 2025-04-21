@@ -1,6 +1,7 @@
 package com.zidiogroup9.expensemanagement.services;
 
 import com.zidiogroup9.expensemanagement.dtos.*;
+import com.zidiogroup9.expensemanagement.entities.User;
 
 public interface AuthService {
     UserDto signUp(SignUpDto signUpDto);
@@ -8,4 +9,5 @@ public interface AuthService {
     String[] refreshToken(String refreshToken);
     void sendResetLink(String email);
     void resetPassword(String token, String newPassword);
+
 }
