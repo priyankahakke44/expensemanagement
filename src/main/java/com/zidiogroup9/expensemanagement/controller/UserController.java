@@ -3,63 +3,36 @@ package com.zidiogroup9.expensemanagement.controller;
 
 import com.zidiogroup9.expensemanagement.advices.ApiResponse;
 import com.zidiogroup9.expensemanagement.dtos.ChangePasswordDto;
+import com.zidiogroup9.expensemanagement.dtos.UpdateUserDto;
 import com.zidiogroup9.expensemanagement.dtos.UserDto;
-import com.zidiogroup9.expensemanagement.services.AuthService;
+import com.zidiogroup9.expensemanagement.services.Impl.UserServiceImpl;
 import com.zidiogroup9.expensemanagement.services.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
-    @GetMapping(path = "/profile")
-    public ResponseEntity<UserDto> getProfile(){
-        return ResponseEntity.ok(userService.getProfile());
-    }
-    @PatchMapping(path = "/changePassword")
-    public ResponseEntity<ApiResponse<?>> changePassword(@RequestBody ChangePasswordDto changePasswordDto){
-        userService.changePassword(changePasswordDto);
-        ApiResponse<String> response = new ApiResponse<>("Password changed successfully");
-        return ResponseEntity.ok(response);
-    }
-}
-package com.zidiogroup9.expensemanagement.controller;
-
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.zidiogroup9.expensemanagement.dtos.UpdateUserDto;
-import com.zidiogroup9.expensemanagement.dtos.UserDto;
-import com.zidiogroup9.expensemanagement.entities.User;
-import com.zidiogroup9.expensemanagement.services.Impl.AuthServiceImpl;
-import com.zidiogroup9.expensemanagement.services.Impl.UserServiceimpl;
-
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-
-import org.apache.catalina.mapper.Mapper;
-import org.modelmapper.ModelMapper;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
-@RestController
-@RequestMapping("/api/user")
-@RequiredArgsConstructor
-public class UserController {
-	private final UserServiceimpl userServiceimpl;
+	private final UserServiceImpl userServiceimpl;
 	private final ModelMapper mapper;
+
+	private final UserService userService;
+
+	@GetMapping(path = "/profile")
+	public ResponseEntity<UserDto> getProfile(){
+		return ResponseEntity.ok(userService.getProfile());
+	}
+	@PatchMapping(path = "/changepassword")
+	public ResponseEntity<ApiResponse<?>> changePassword(@RequestBody ChangePasswordDto changePasswordDto){
+		userService.changePassword(changePasswordDto);
+		ApiResponse<String> response = new ApiResponse<>("Password changed successfully");
+		return ResponseEntity.ok(response);
+	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<UserDto> findUserById(@PathVariable(name = "id") String id, HttpServletResponse response) {

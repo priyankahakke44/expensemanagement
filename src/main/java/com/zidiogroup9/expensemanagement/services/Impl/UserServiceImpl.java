@@ -1,32 +1,51 @@
 package com.zidiogroup9.expensemanagement.services.Impl;
 
 import java.util.Optional;
-import java.util.Set;
 
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import com.zidiogroup9.expensemanagement.dtos.ChangePasswordDto;
+import com.zidiogroup9.expensemanagement.exceptions.InvalidPasswordException;
+import com.zidiogroup9.expensemanagement.exceptions.PasswordMismatchException;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.zidiogroup9.expensemanagement.dtos.SignUpDto;
 import com.zidiogroup9.expensemanagement.dtos.UpdateUserDto;
 import com.zidiogroup9.expensemanagement.dtos.UserDto;
 import com.zidiogroup9.expensemanagement.entities.User;
-import com.zidiogroup9.expensemanagement.entities.enums.Role;
 import com.zidiogroup9.expensemanagement.exceptions.ResourceNotFoundException;
 import com.zidiogroup9.expensemanagement.exceptions.RuntimeConflictException;
 import com.zidiogroup9.expensemanagement.repositories.UserRepository;
 import com.zidiogroup9.expensemanagement.services.UserService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
 
-public class UserServiceimpl implements UserService {
+public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final ModelMapper modelMapper;
+	private final PasswordEncoder passwordEncoder;
+	@Override
+	public UserDto getProfile() {
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return modelMapper.map(user,UserDto.class);
+	}
+
+	@Override
+	public void changePassword(ChangePasswordDto changePasswordDto) {
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+		if (!passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword())){
+			throw new InvalidPasswordException("Wrong Password");
+		}
+		if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())){
+			throw new PasswordMismatchException("Password are not same");
+		}
+		user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
+		userRepository.save(user);
+	}
 
 	@Override
 	public UserDto findUserById(String id) {
